@@ -377,7 +377,12 @@ clean_opts(#parsed_params{help = true}) ->
     #config{help = true};
 clean_opts(#parsed_params{include = []} = Opts0) ->
     log("Set includes to default current dir.~n"),
-    clean_opts(Opts0#parsed_params{include = [?DEFAULT_PATH]});
+    % 因为工作根目录除了有erlang工程代码还有客户端、脚本工具等文件，这里直接指定erlang工程根目录，加快打tag速度
+    Include = case filelib:is_dir("server") of
+                  true -> "server";
+                  _ -> ?DEFAULT_PATH
+              end,
+    clean_opts(Opts0#parsed_params{include = [Include]});
 clean_opts(#parsed_params{otp = true, include = Inc} = Opts0) ->
     log("Including OTP in.~n"),
     AllIncludes = [code:lib_dir() | Inc],
@@ -387,7 +392,7 @@ clean_opts(#parsed_params{output = []} = Opts0) ->
     clean_opts(Opts0#parsed_params{output = ["tags"]});
 clean_opts(#parsed_params{include = Included,
                           ignore = Ignored,
-                          output = [Output],
+                          output = [Output | _],
                           follow = FollowSymLinks}) ->
     log("Set includes to default current dir.~n"),
     #config{explore = to_explore_as_include_minus_ignored(
