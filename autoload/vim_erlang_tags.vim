@@ -89,7 +89,7 @@ function! vim_erlang_tags#DelTagOfFile(file)
   elseif s:os == "Linux"
       let cmd = 'sed -i "/' . f . '/d" "' . tagfilename . '"'
   endif
-  return jobstart(cmd)
+  return system(cmd)
 endfunction
 
 function! vim_erlang_tags#UpdateTags()
@@ -99,7 +99,7 @@ function! vim_erlang_tags#UpdateTags()
   let tagfilename = cwd . "/tags"
   let temptags = cwd . "/temptags"
   let exec_cmd = s:GetExecuteCmd()
-  call vim_erlang_tags#DelTagOfFile(f)
+  "call vim_erlang_tags#DelTagOfFile(f)
   let param = " --include " . f . " --output " . temptags
   call vim_erlang_tags#VimErlangTags(param)
   let cmd = "tail -n +2 " . temptags . " | sort -o " . tagfilename . " -m -u " . tagfilename . " - "
